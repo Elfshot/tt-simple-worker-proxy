@@ -10,6 +10,19 @@
 	"observability": {
 		"enabled": true
 	},
+  "unsafe": {
+    "bindings": [
+      {
+        "name": "RATE_LIMIT",
+        "type": "ratelimit",
+        "namespace_id": "6910810200001",
+        "simple": {
+          "limit": 7,
+          "period": 60
+        }
+      }
+    ]
+  },
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
@@ -28,6 +41,7 @@
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
 	 */
 	// "vars": { "MY_VARIABLE": "production_value" },
+  "vars": {"RATE_LIMIT_ENABLED": "true"}
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/

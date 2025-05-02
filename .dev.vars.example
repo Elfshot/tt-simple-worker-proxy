@@ -2,3 +2,4 @@
 
 DEFAULT_TYCOON_PRIVATE="tycoon_private_key"
 DEFAULT_TYCOON_PUBLIC="tycoon_public_key"
+RATE_LIMIT_ENABLED="false"

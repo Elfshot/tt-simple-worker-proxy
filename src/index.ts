@@ -19,8 +19,9 @@ const InputParamsSchema = z.object({
 
 })
 // The actual min/max values are arbitrary, and the headers themselves are optional
-// Remove .optional() to mandate them for your routes
+// Remove .optional() and .default() to mandate user keys for your routes
 // [Note: this does not ensure the headers are correct, just that if present, they are well-formated]
+// [Note: this also runs a validation on your default key as if it were the user's key]
 const TycoonHeadersSchema = z.object({
   'X-Tycoon-Key': z.string().min(10).max(50).optional().default(env.DEFAULT_TYCOON_PRIVATE),
   'X-Tycoon-Public-Key': z.string().min(12).max(30).regex(/^[1-9][0-9]{0,6}_.+$/).optional().default(env.DEFAULT_TYCOON_PUBLIC),
@@ -50,6 +51,20 @@ const forwardRoute = createRoute({
 })
 
 const app = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
+
+app.use("*", async (c, next) => {
+  if (env.RATE_LIMIT_ENABLED !== "true") return await next()
+
+  const ip = c.req.header("CF-Connecting-IP") || c.req.header("X-Forwarded-For") || "Unknown IP";
+  const { success } = await c.env.RATE_LIMIT.limit({ key: ip});
+
+  if (!success) {
+    console.log(`Rate limit exceeded for ${ip}`);
+    return c.text("Rate limit exceeded", 429);
+  }
+
+  return await next()
+});
 
 app.openapi(forwardRoute, async (c) => {
   const {server, forward} = c.req.valid("param");

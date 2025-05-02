@@ -1,5 +1,6 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi'
 import { createRoute } from '@hono/zod-openapi'
+import { env } from 'cloudflare:workers';
 
 const servers = {
   main: 'http://server.tycoon.community:30120',
@@ -17,13 +18,12 @@ const InputParamsSchema = z.object({
   forward: z.string().min(1).max(100),
 
 })
-
 // The actual min/max values are arbitrary, and the headers themselves are optional
 // Remove .optional() to mandate them for your routes
 // [Note: this does not ensure the headers are correct, just that if present, they are well-formated]
 const TycoonHeadersSchema = z.object({
-  'X-Tycoon-Key': z.string().min(10).max(50).optional(),
-  'X-Tycoon-Public-Key': z.string().min(12).max(30).regex(/^[1-9][0-9]{0,6}_.+$/).optional(),
+  'X-Tycoon-Key': z.string().min(10).max(50).optional().default(env.DEFAULT_TYCOON_PRIVATE),
+  'X-Tycoon-Public-Key': z.string().min(12).max(30).regex(/^[1-9][0-9]{0,6}_.+$/).optional().default(env.DEFAULT_TYCOON_PUBLIC),
 })
 
 // If you add more routes, you can serve docs too
@@ -50,6 +50,7 @@ const forwardRoute = createRoute({
 })
 
 const app = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
+
 app.openapi(forwardRoute, async (c) => {
   const {server, forward} = c.req.valid("param");
   const headers = c.req.valid("header");

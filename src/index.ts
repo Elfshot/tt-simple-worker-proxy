@@ -55,7 +55,7 @@ const app = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 app.use("*", async (c, next) => {
   if (env.RATE_LIMIT_ENABLED !== "true") return await next()
 
-  const ip = c.req.header("CF-Connecting-IP") || c.req.header("X-Forwarded-For") || "Unknown IP";
+  const ip = c.req.header("cf-connecting-ip") || c.req.header("x-forwarded-for") || "Unknown IP";
   const { success } = await c.env.RATE_LIMIT.limit({ key: ip});
 
   if (!success) {

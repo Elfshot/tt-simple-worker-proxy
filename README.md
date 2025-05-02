@@ -20,7 +20,7 @@ bunx wrangler secret put DEFAULT_TYCOON_PUBLIC
 [wrangler.jsonc](wrangler.jsonc) is the configuration file for Cloudflare Workers. You can set up stuff there, see [https://developers.cloudflare.com/workers/wrangler/configuration/](https://developers.cloudflare.com/workers/wrangler/configuration/).
 
 By default, there is a rate limiter with 7 requests per minute, you can change the `limit` to whatever. The only valid settings for `period` are `10` and `60` for seconds.
-You can disable the rate limiter by setting `"RATE_LIMIT_ENABLED": "false"`.
+You can disable the rate limiter by setting `"RATE_LIMIT_ENABLED": "false"`. Admittedly, the worker rate limits aren't great, you may want to setup [WAF rules](https://developers.cloudflare.com/waf/rate-limiting-rules/) instead or in combination.
 
 The following is a manual deployment, you can link a GitHub repository to Cloudflare and set up automatic deployments.
 
